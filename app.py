@@ -10,7 +10,7 @@ load_dotenv()
 
 import numpy as np
 from flask import (Flask, render_template, request, redirect,
-                   url_for, flash, session)
+                   url_for, flash, session, abort)
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (LoginManager, UserMixin, login_user,
                          logout_user, login_required, current_user)
@@ -26,7 +26,7 @@ BASE_DIR = os.path.dirname(__file__)
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "plant-pulse-dev-secret-change-in-production")
 app.config["UPLOAD_FOLDER"]               = os.path.join(BASE_DIR, "uploads")
-app.config["MAX_CONTENT_LENGTH"]          = 16 * 1024 * 1024
+app.config["MAX_CONTENT_LENGTH"]          = 32 * 1024 * 1024
 app.config["SQLALCHEMY_DATABASE_URI"]     = os.getenv(
     "DATABASE_URL",
     "sqlite:///" + os.path.join(BASE_DIR, "plant_pulse.db")
@@ -663,6 +663,11 @@ def download_pdf(filename):
         as_attachment=True,
         download_name=safe_name,
     )
+
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    flash("The image file is too large (limit is 32MB). Please upload a smaller image.", "error")
+    return redirect(url_for("upload")), 413
 
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
