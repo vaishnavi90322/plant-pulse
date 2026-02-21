@@ -667,7 +667,7 @@ def download_pdf(filename):
 @app.errorhandler(413)
 def request_entity_too_large(error):
     flash("The image file is too large (limit is 32MB). Please upload a smaller image.", "error")
-    return redirect(url_for("upload")), 413
+    return redirect(url_for("upload"))
 
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
