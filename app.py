@@ -27,10 +27,16 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "plant-pulse-dev-secret-change-in-production")
 app.config["UPLOAD_FOLDER"]               = os.path.join(BASE_DIR, "uploads")
 app.config["MAX_CONTENT_LENGTH"]          = 16 * 1024 * 1024
-app.config["SQLALCHEMY_DATABASE_URI"]     = "sqlite:///" + os.path.join(BASE_DIR, "plant_pulse.db")
+app.config["SQLALCHEMY_DATABASE_URI"]     = os.getenv(
+    "DATABASE_URL",
+    "sqlite:///" + os.path.join(BASE_DIR, "plant_pulse.db")
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
+
+# Ensure uploads folder always exists (including on Render)
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 db           = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -664,5 +670,5 @@ def uploaded_file(filename):
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 if __name__ == "__main__":
-    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
-    app.run(debug=True)
+    debug = os.getenv("FLASK_DEBUG", "true").lower() == "true"
+    app.run(debug=debug)

@@ -7,4 +7,5 @@ python-dotenv
 pillow
 numpy
 werkzeug
-tensorflow
+reportlab
+gunicorn
