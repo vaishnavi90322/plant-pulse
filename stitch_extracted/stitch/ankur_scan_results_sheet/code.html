@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ankur Scan Results</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3D6652",
+                        "background-light": "#F9F7F2",
+                        "background-dark": "#121412",
+                    },
+                    fontFamily: {
+                        display: ["Plus Jakarta Sans", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "16px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>body {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    -webkit-tap-highlight-color: transparent
+    }
+.ios-status-bar {
+    height: 44px
+    }
+.bottom-sheet {
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1)
+    }
+.blurred-bg {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuD6mpQ7clEs162xDOtK6soxupjH0KoahoYKVmSS7vLzQ_RQGVkn09ndSNbDYHBjpVf3W61SXCgvM2C77KgmS8qqEa3WdtzaYGPQSm4BJ3y1SLmUHelTiNWXLT9r7zr2-_D-Y_gaFjJPf1X_6gRDn9AFgE0dr9aMbjJNrgmOiBF71lfTbA88OXN3NM4fYjljN43I4F_ljEEpO4IFW9FgJrn4Qk8IN0WTvDk-YEYNNJW8-zQQFsnrX0ioxECy_pXpR_XVAnNmpSavcBA);
+    background-size: cover;
+    background-position: center;
+    filter: blur(8px) brightness(0.7)
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-0 sm:p-4">
+<div class="relative w-full max-w-[393px] h-[852px] bg-white dark:bg-black overflow-hidden rounded-[3rem] shadow-2xl border-[8px] border-slate-800 dark:border-slate-900">
+<div class="absolute inset-0 blurred-bg"></div>
+<div class="absolute top-0 w-full ios-status-bar flex justify-between items-center px-8 z-20">
+<span class="text-white text-sm font-semibold">9:41</span>
+<div class="flex items-center gap-1.5">
+<span class="material-icons-round text-white text-[16px]">signal_cellular_alt</span>
+<span class="material-icons-round text-white text-[16px]">wifi</span>
+<span class="material-icons-round text-white text-[16px]">battery_full</span>
+</div>
+</div>
+<div class="absolute top-12 left-0 w-full px-6 flex justify-between items-center z-20">
+<button class="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white">
+<span class="material-icons-round">arrow_back</span>
+</button>
+<div class="flex gap-1 bg-black/30 backdrop-blur-md p-1 rounded-full border border-white/20">
+<button class="px-4 py-1.5 text-xs font-medium rounded-full bg-white text-black">Plant</button>
+<button class="px-4 py-1.5 text-xs font-medium rounded-full text-white">Disease</button>
+</div>
+<button class="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white">
+<span class="material-icons-round text-lg">bolt</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 w-full bg-background-light dark:bg-zinc-900 rounded-t-[40px] bottom-sheet h-[70%] z-30 transition-all">
+<div class="flex justify-center pt-4 pb-2">
+<div class="w-12 h-1.5 bg-slate-300 dark:bg-zinc-700 rounded-full"></div>
+</div>
+<div class="px-6 pb-20 overflow-y-auto h-full">
+<section class="mt-4">
+<h2 class="text-lg font-bold text-slate-800 dark:text-white mb-4">Best match</h2>
+<div class="bg-white dark:bg-zinc-800 p-4 rounded-3xl border border-slate-100 dark:border-zinc-700 flex items-center gap-4 group cursor-pointer hover:shadow-md transition-all">
+<div class="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
+<img alt="Plant disease thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwZyxQfkgxj5HnUVcbyiwaSPtV46c-v9BgoxgXjgZwf_s0kst_R3PPuWIILfoEeUTeit_Cf6G8eOytWAWKuNfuLlNx_24HUpd6q94Rzs55LmYNZDPwYXlZZO8HExBjzNmmp77WqE19Je2YLawn3rjCD_nT5QZWZXUSMK2gRRKHnAaSlxwnIdIsFs-akcUXdqBByDzTFJqPDOe3a6aOL6hgJfu7nEVfDiT1q5j1yiTcxgiZBClgubGGCchxtAzY7tMcVcXRQvgOsMg"/>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white truncate">Septoria Leaf Spot Tomato</h3>
+<p class="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">(Septoria Spots - Tomato Plant)</p>
+<p class="text-[11px] font-medium text-primary mt-0.5 italic">Zephyranthes Rosea</p>
+</div>
+<div class="bg-primary/10 dark:bg-primary/20 p-2 rounded-full">
+<span class="material-icons-round text-primary text-xl">arrow_forward</span>
+</div>
+</div>
+</section>
+<section class="mt-8">
+<h2 class="text-lg font-bold text-slate-800 dark:text-white mb-4">Similar</h2>
+<div class="space-y-3">
+<div class="bg-white dark:bg-zinc-800 p-3 rounded-2xl border border-slate-100 dark:border-zinc-700 flex items-center gap-4 cursor-pointer">
+<div class="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Disease match thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCVBZabTZLJOADE61D2WJQS1hxXjkoXFzrBIpNNFoBEdyWIUvQHQLcHmbp2qiYZaEo2wxbjd3dTOK_fHkMkLMjxXwdX4cEXupXkLPIuA__huokT89RMHFnlxDOuEYIXbU2qqlzh6nz8RVXoUGKe__xyUACkT8cZugjqa0qJPj8-QX2FLNxdrZc2LnD2R6dWEc4oubEmnpBgyTanG2MHUeK8bFzEgPbq-xlTCLqEm7eUWCLd5OxGbI26shNcVh3IimNi4RQ6pPhTuk"/>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="text-xs font-bold text-slate-900 dark:text-white truncate">Lesions of Septoria leaf spot</h3>
+<p class="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5">Zephyranthes Candida</p>
+</div>
+<span class="material-icons-round text-slate-400 text-lg">arrow_forward</span>
+</div>
+<div class="bg-white dark:bg-zinc-800 p-3 rounded-2xl border border-slate-100 dark:border-zinc-700 flex items-center gap-4 cursor-pointer">
+<div class="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Disease match thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7KvsfPMGN8D6YV6sGXHg1vW098sdP5qMFU72WJN1FPD5SWyg-m4dU4F-YfgyB6L2roMIK9TtcSC8U5ScOyAT1tNKjxgBVBS0R41ZBSRQg8iizcmUj9d_CT-txdMtUfCv6TbPzywZJ2SrOuyRuyHiHMtv9N-wr63D-_bh0M3-WBFVj3g6SN0DXU6uKqP5TcX5Gk46PHtQkur2Cy4-sFbnVI0-iqjxfVPzIRKZGSQOhY1hRYCqPce3927oLF55u3FWHeDH0kVuNEZ8"/>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="text-xs font-bold text-slate-900 dark:text-white truncate">Septoria Leaf Fall</h3>
+<p class="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5">Zephyranthes Citrina</p>
+</div>
+<span class="material-icons-round text-slate-400 text-lg">arrow_forward</span>
+</div>
+<div class="bg-white dark:bg-zinc-800 p-3 rounded-2xl border border-slate-100 dark:border-zinc-700 flex items-center gap-4 cursor-pointer">
+<div class="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Disease match thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV0f_fZAOasM1ZbOmY476b_IhzetUvwOIWY1yhbGB1g6MRREHGSu-NqcqTpbY-D3hEJX_GSkaid-z-3kXJi0fdz9DFq82g-j9oRQrOTYSUisIy9sM7tja_TbHqwazBOrl_u6iFmotrNW4yZsVmSyax9NRwhpf74S1zkV5v_wi5oMOHSDS3iMeDA_8L5MQQEEpzjdRgFn9GDwDQSFLjsFoiaJ04Grjwg0ovWdeHSVALHyNixQeGtWunu6q4E4J_q5L-oXrS4-0ySwY"/>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="text-xs font-bold text-slate-900 dark:text-white truncate">Lesions of Septoria leaf spot</h3>
+<p class="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5">Zephyranthes Robusta</p>
+</div>
+<span class="material-icons-round text-slate-400 text-lg">arrow_forward</span>
+</div>
+<div class="bg-white dark:bg-zinc-800 p-3 rounded-2xl border border-slate-100 dark:border-zinc-700 flex items-center gap-4 cursor-pointer">
+<div class="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+<img alt="Disease match thumbnail" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYuCFZvvcL0gr4m4UpseiWOPzWD6akdyg4PalllOw_5C3vywjEzIhddLKMEZ2ccKi2absbInTeqaOwquyV3L2CqhdolRIlKGOQTh9COy_ZsOvq6wv44VaQF5aUV3HJCneswYW8o5bEJmNZ6pbMOfBURxC2i1d1fIBDQTpuszCXYBpvZg8aQOT3m4HGfmi0sTTnDzlmbTy7zysxbALHyi3UQdCmOG2C8kGke6qGOrqpOOOLWtN6gmckhoWfac3NzrNgx1WhfQwVGng"/>
+</div>
+<div class="flex-grow min-w-0">
+<h3 class="text-xs font-bold text-slate-900 dark:text-white truncate">Fungal Infection Early Stage</h3>
+<p class="text-[10px] text-slate-500 dark:text-zinc-400 mt-0.5">Zephyranthes Carinata</p>
+</div>
+<span class="material-icons-round text-slate-400 text-lg">arrow_forward</span>
+</div>
+</div>
+</section>
+</div>
+<div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-black/10 dark:bg-white/20 rounded-full"></div>
+</div>
+<div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-48 h-48 border-2 border-white/40 rounded-3xl pointer-events-none">
+<div class="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-white rounded-tl-xl"></div>
+<div class="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-white rounded-tr-xl"></div>
+<div class="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-white rounded-bl-xl"></div>
+<div class="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-white rounded-br-xl"></div>
+</div>
+</div>
+
+</body></html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Account — Plant Pulse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            background: linear-gradient(135deg, var(--bg) 0%, rgba(74, 109, 75, 0.06) 100%);
+        }
+
+        .auth-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        }
+
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-bottom: 1.75rem;
+            text-decoration: none;
+        }
+
+        .auth-logo svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .auth-logo-name {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+        }
+
+        .auth-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text);
+            text-align: center;
+            margin-bottom: 0.4rem;
+        }
+
+        .auth-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            margin-bottom: 2rem;
+        }
+
+        .flash {
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .flash.error {
+            background: rgba(220, 38, 38, 0.08);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            color: #b91c1c;
+        }
+
+        .flash.success {
+            background: rgba(74, 163, 78, 0.1);
+            border: 1px solid rgba(74, 163, 78, 0.25);
+            color: #1a5c1e;
+        }
+
+        .flash.info {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: #1d4ed8;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: var(--text);
+            background: var(--bg);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 109, 75, 0.12);
+        }
+
+        .password-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 0.85rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+            margin-top: 0.5rem;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-auth:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 1.25rem 0;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            transition: background 0.2s, border-color 0.2s;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .btn-google:hover {
+            background: var(--bg-alt);
+            border-color: #dadce0;
+        }
+
+        .btn-google svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .terms-note {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 1rem;
+            line-height: 1.5;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-page">
+        <div class="auth-card">
+
+            <!-- Logo -->
+            <a href="{{ url_for('home') }}" class="auth-logo">
+                <svg viewBox="0 0 40 40" fill="none">
+                    <path
+                        d="M20 5C20 5 12 15 12 22C12 26.4183 15.5817 30 20 30C24.4183 30 28 26.4183 28 22C28 15 20 5 20 5Z"
+                        fill="#4A6D4B" />
+                    <path d="M20 5C20 5 28 15 28 22C28 26.4183 24.4183 30 20 30L20 5Z" fill="#76A33E" />
+                    <path
+                        d="M26 14C26 14 33 19 33 25C33 28.3137 30.3137 31 27 31C23.6863 31 21 28.3137 21 25C21 19 26 14 26 14Z"
+                        fill="#88B237" opacity="0.7" />
+                </svg>
+                <span class="auth-logo-name">Plant Pulse</span>
+            </a>
+
+            <h1 class="auth-title">Create your account</h1>
+            <p class="auth-subtitle">Join Plant Pulse and start diagnosing plants with AI</p>
+
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                <span class="material-icons-round" style="font-size:18px">
+                    {{ 'check_circle' if category == 'success' else 'error' if category == 'error' else 'info' }}
+                </span>
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endwith %}
+
+            <!-- Google signup -->
+            <a href="{{ url_for('google_login') }}" class="btn-google">
+                <svg viewBox="0 0 48 48">
+                    <path fill="#EA4335"
+                        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                    <path fill="#4285F4"
+                        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                    <path fill="#FBBC05"
+                        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                    <path fill="#34A853"
+                        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                </svg>
+                Continue with Google
+            </a>
+
+            <div class="auth-divider">or register with email</div>
+
+            <!-- Registration form -->
+            <form method="POST" action="{{ url_for('register') }}">
+                <div class="form-group">
+                    <label class="form-label" for="name">Full Name</label>
+                    <input class="form-input" type="text" id="name" name="name" placeholder="Your name" required
+                        value="{{ request.form.get('name', '') }}" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input class="form-input" type="email" id="email" name="email" placeholder="you@example.com"
+                        required value="{{ request.form.get('email', '') }}" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input class="form-input" type="password" id="password" name="password"
+                        placeholder="At least 6 characters" required />
+                    <p class="password-hint">Minimum 6 characters</p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="confirm">Confirm Password</label>
+                    <input class="form-input" type="password" id="confirm" name="confirm"
+                        placeholder="Repeat your password" required />
+                </div>
+                <button type="submit" class="btn-auth">Create Account</button>
+            </form>
+
+            <p class="terms-note">By creating an account you agree to our terms of service.</p>
+
+            <div class="auth-footer">
+                Already have an account?
+                <a href="{{ url_for('login') }}">Sign in</a>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

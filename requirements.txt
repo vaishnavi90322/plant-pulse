@@ -1,0 +1,10 @@
+flask
+flask-sqlalchemy
+flask-login
+authlib
+requests
+python-dotenv
+pillow
+numpy
+werkzeug
+tensorflow

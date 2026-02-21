@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Result — {{ disease }} | Plant Pulse</title>
+    <meta name="description"
+        content="AI detection result: {{ disease }} in {{ plant }} with {{ confidence }}% confidence." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="{{ url_for('home') }}" class="logo">
+                <svg viewBox="0 0 40 40" fill="none">
+                    <path
+                        d="M20 5C20 5 12 15 12 22C12 26.4183 15.5817 30 20 30C24.4183 30 28 26.4183 28 22C28 15 20 5 20 5Z"
+                        fill="#4A6D4B" />
+                    <path d="M20 5C20 5 28 15 28 22C28 26.4183 24.4183 30 20 30L20 5Z" fill="#76A33E" />
+                    <path
+                        d="M26 14C26 14 33 19 33 25C33 28.3137 30.3137 31 27 31C23.6863 31 21 28.3137 21 25C21 19 26 14 26 14Z"
+                        fill="#88B237" opacity="0.7" />
+                </svg>
+                Plant Pulse
+            </a>
+            <button class="hamburger" id="ham"><span></span><span></span><span></span></button>
+            <div class="nav-links" id="nav-links">
+                <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About</a>
+                <a href="{{ url_for('upload') }}" class="nav-link active">Scan Plant</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('history') }}" class="nav-link">History</a>
+                {% endif %}
+                <a href="{{ url_for('upload') }}" class="nav-link nav-cta">
+                    <span class="material-icons-round"
+                        style="font-size:16px;vertical-align:middle">filter_center_focus</span>&nbsp;Scan Now
+                </a>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-left:0.5rem;">
+                {% if current_user.is_authenticated %}
+                {% if current_user.avatar_url %}
+                <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" title="{{ current_user.name }}"
+                    style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--primary-light);">
+                {% else %}
+                <div style="width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;"
+                    title="{{ current_user.name }}">{{ current_user.name[0].upper() }}</div>
+                {% endif %}
+                <a href="{{ url_for('logout') }}"
+                    style="font-size:0.82rem;font-weight:600;color:var(--text-muted);text-decoration:none;">Sign out</a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="nav-link" style="font-weight:700;">Login</a>
+                <a href="{{ url_for('register') }}" class="nav-link nav-cta" style="padding:0.4rem 1rem;">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── BREADCRUMB ── -->
+    <div
+        style="max-width:960px;margin:0 auto;padding:1.25rem 1.5rem 0;display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:var(--text-muted);">
+        <a href="{{ url_for('home') }}" style="color:var(--primary);font-weight:600;">Home</a>
+        <span class="material-icons-round" style="font-size:14px">chevron_right</span>
+        <a href="{{ url_for('upload') }}" style="color:var(--primary);font-weight:600;">Scan</a>
+        <span class="material-icons-round" style="font-size:14px">chevron_right</span>
+        <span>Result</span>
+    </div>
+
+    <!-- ── RESULT GRID ── -->
+    <div class="result-grid">
+
+        <!-- LEFT — uploaded image -->
+        <div>
+            <div class="result-image-card">
+                <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Scanned plant leaf" />
+                <div class="result-image-footer">
+                    <span style="font-size:0.8rem;font-weight:600;color:var(--text-muted);">Uploaded Image</span>
+                    <!-- Confidence chip -->
+                    {% if confidence >= 90 %}
+                    <span class="confidence-pill high">
+                        <span class="material-icons-round" style="font-size:14px">verified</span>
+                        {{ confidence }}% confidence
+                    </span>
+                    {% elif confidence >= 75 %}
+                    <span class="confidence-pill medium">
+                        <span class="material-icons-round" style="font-size:14px">info</span>
+                        {{ confidence }}% confidence
+                    </span>
+                    {% else %}
+                    <span class="confidence-pill low">
+                        <span class="material-icons-round" style="font-size:14px">warning</span>
+                        {{ confidence }}% confidence
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Confidence bar -->
+            <div
+                style="margin-top:1rem;background:var(--card);border-radius:var(--radius);padding:1.25rem 1.5rem;border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;">
+                    <span style="font-size:0.8rem;font-weight:700;color:var(--text-muted);">AI CONFIDENCE</span>
+                    <span style="font-size:0.8rem;font-weight:800;color:var(--primary);">{{ confidence }}%</span>
+                </div>
+                <div style="height:8px;background:var(--bg2);border-radius:99px;overflow:hidden;">
+                    <div id="conf-bar" data-width="{{ confidence }}"
+                        style="height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width 1s ease;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT — info panel -->
+        <div class="result-info">
+
+            <!-- Header card -->
+            <div class="result-header" {% if is_healthy %}style="background:linear-gradient(135deg,#1a7a3c,#22c55e)" {%
+                endif %}>
+                <div class="plant-name">{{ plant }}</div>
+                <div class="disease-name">
+                    {% if is_healthy %}
+                    🌿 Healthy Plant
+                    {% else %}
+                    {{ disease }}
+                    {% endif %}
+                </div>
+                {% if is_healthy %}
+                <div class="healthy-badge">
+                    <span class="material-icons-round" style="font-size:16px">check_circle</span>
+                    No disease detected
+                </div>
+                {% else %}
+                <div style="font-size:0.8rem;opacity:0.75;margin-top:0.35rem;">Disease detected — see details below
+                </div>
+                {% endif %}
+            </div>
+
+            {% if not is_healthy %}
+            <!-- Info cards -->
+            <div class="info-card">
+                <div class="info-label">Disease Category</div>
+                <div class="info-value">{{ category }}</div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-label">Description</div>
+                <div class="info-value muted">{{ description }}</div>
+            </div>
+
+            {% if treatment %}
+            <div class="info-card" style="padding:0;overflow:hidden;">
+                <div class="info-label" style="padding:0.6rem 1rem 0;display:flex;align-items:center;gap:0.4rem;">
+                    <span class="material-icons-round" style="font-size:16px;color:var(--primary)">medication</span>
+                    Treatment &amp; Prevention
+                </div>
+                <div style="display:flex;flex-direction:column;gap:0;">
+
+                    {% if treatment.biological %}
+                    <div style="padding:0.6rem 1rem;border-top:1px solid var(--border);">
+                        <div
+                            style="font-size:0.72rem;font-weight:700;color:#2d7a30;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;">
+                            🌿 Biological</div>
+                        <ul
+                            style="margin:0;padding-left:1.2rem;font-size:0.84rem;color:var(--text-muted);line-height:1.7;">
+                            {% for item in treatment.biological %}<li>{{ item }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if treatment.chemical %}
+                    <div style="padding:0.6rem 1rem;border-top:1px solid var(--border);">
+                        <div
+                            style="font-size:0.72rem;font-weight:700;color:#2563eb;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;">
+                            🧪 Chemical</div>
+                        <ul
+                            style="margin:0;padding-left:1.2rem;font-size:0.84rem;color:var(--text-muted);line-height:1.7;">
+                            {% for item in treatment.chemical %}<li>{{ item }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if treatment.prevention %}
+                    <div style="padding:0.6rem 1rem;border-top:1px solid var(--border);">
+                        <div
+                            style="font-size:0.72rem;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;">
+                            🛡️ Prevention</div>
+                        <ul
+                            style="margin:0;padding-left:1.2rem;font-size:0.84rem;color:var(--text-muted);line-height:1.7;">
+                            {% for item in treatment.prevention %}<li>{{ item }}</li>{% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+            {% endif %}
+
+            {% if similar_images %}
+            <div>
+                <h3
+                    style="font-weight:700;font-size:0.95rem;color:var(--text);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.4rem;">
+                    <span class="material-icons-round" style="color:var(--primary)">image_search</span>
+                    Similar Disease Images
+                </h3>
+                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                    {% for img_url in similar_images %}
+                    <img src="{{ img_url }}" alt="Similar disease" loading="lazy"
+                        style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:2px solid var(--border);">
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <!-- Healthy message -->
+            <div class="info-card" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.05);">
+                <div class="info-label" style="color:var(--success);">Great News!</div>
+                <div class="info-value muted">
+                    Your {{ plant }} plant appears to be healthy. No disease detected.
+                    Continue regular watering, fertilising, and sunlight routines to keep it thriving!
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="result-actions">
+                <a href="{{ url_for('upload') }}" class="btn-scan-again">
+                    <span class="material-icons-round" style="font-size:18px">refresh</span>
+                    Scan Another
+                </a>
+                <a href="{{ url_for('history') }}" class="btn-scan-again"
+                    style="background:rgba(74,109,75,0.08);border-color:var(--primary);color:var(--primary);">
+                    <span class="material-icons-round" style="font-size:18px">history</span>
+                    History
+                </a>
+                <a href="{{ url_for('download_pdf', filename=filename) }}" class="btn-scan-again"
+                    style="background:rgba(74,109,75,0.12);border-color:var(--primary);color:var(--primary);">
+                    <span class="material-icons-round" style="font-size:18px">download</span>
+                    Download PDF
+                </a>
+                <a href="{{ url_for('home') }}" class="btn-primary"
+                    style="flex:1;min-width:140px;justify-content:center;text-align:center;">
+                    <span class="material-icons-round" style="font-size:18px">home</span>
+                    Home
+                </a>
+            </div>
+
+            <!-- Disclaimer -->
+            <p
+                style="font-size:0.76rem;color:var(--text-muted);line-height:1.6;border-top:1px solid var(--border);padding-top:1rem;">
+                ⚠️ This is an AI-based prediction and may not be 100% accurate.
+                Consult a certified agronomist or plant pathologist for professional diagnosis and treatment advice.
+            </p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 <strong>Plant Pulse</strong> — AI Plant Disease Detection &nbsp;|&nbsp;
+            <a href="{{ url_for('home') }}">Home</a> &nbsp;|&nbsp;
+            <a href="{{ url_for('upload') }}">Scan Again</a> &nbsp;|&nbsp;
+            <a href="{{ url_for('history') }}">History</a>
+        </p>
+    </footer>
+
+    <script>
+        document.getElementById('ham').addEventListener('click', () => {
+            document.getElementById('nav-links').classList.toggle('open');
+        });
+
+        // Animate confidence bar on load
+        window.addEventListener('load', () => {
+            const bar = document.getElementById('conf-bar');
+            if (bar) {
+                const target = bar.getAttribute('data-width') + '%';
+                setTimeout(() => { bar.style.width = target; }, 120);
+            }
+        });
+    </script>
+</body>
+
+</html>

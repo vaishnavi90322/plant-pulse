@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scan History — Plant Pulse</title>
+    <meta name="description" content="View your past plant disease scan history powered by Plant Pulse AI." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <style>
+        /* ── History page styles ───────────────────────────────────────── */
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .history-title-block {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .history-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-radius: 999px;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+        }
+
+        .btn-clear {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            background: rgba(220, 38, 38, 0.08);
+            border: 1px solid rgba(220, 38, 38, 0.25);
+            color: #dc2626;
+            border-radius: var(--radius);
+            font-size: 0.83rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-clear:hover {
+            background: rgba(220, 38, 38, 0.15);
+            border-color: rgba(220, 38, 38, 0.4);
+        }
+
+        /* ── Scan card grid ─────────────────────────────────────────────── */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .scan-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .scan-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(74, 109, 75, 0.15);
+            border-color: var(--primary-light);
+        }
+
+        .scan-card-thumb {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: var(--bg-alt);
+            display: block;
+        }
+
+        .scan-card-thumb-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scan-card-body {
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .scan-card-plant {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+        }
+
+        .scan-card-disease {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        .scan-card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .confidence-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+        }
+
+        .confidence-pill.healthy {
+            background: rgba(74, 163, 78, 0.12);
+            color: #2d7a30;
+        }
+
+        .confidence-pill.disease {
+            background: rgba(220, 38, 38, 0.1);
+            color: #b91c1c;
+        }
+
+        .scan-card-date {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .scan-card-category {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .view-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-decoration: none;
+            padding: 0.3rem 0;
+            transition: var(--transition);
+        }
+
+        .view-btn:hover {
+            gap: 0.5rem;
+        }
+
+        /* ── Empty state ──────────────────────────────────────────────────── */
+        .empty-state {
+            text-align: center;
+            padding: 5rem 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: var(--primary-light);
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── Stats bar ────────────────────────────────────────────────────── */
+        .history-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+            flex-wrap: wrap;
+        }
+
+        .hstat {
+            flex: 1;
+            min-width: 120px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.85rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .hstat-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .hstat-val {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .hstat-lbl {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="{{ url_for('home') }}" class="logo">
+                <svg viewBox="0 0 40 40" fill="none">
+                    <path
+                        d="M20 5C20 5 12 15 12 22C12 26.4183 15.5817 30 20 30C24.4183 30 28 26.4183 28 22C28 15 20 5 20 5Z"
+                        fill="#4A6D4B" />
+                    <path d="M20 5C20 5 28 15 28 22C28 26.4183 24.4183 30 20 30L20 5Z" fill="#76A33E" />
+                    <path
+                        d="M26 14C26 14 33 19 33 25C33 28.3137 30.3137 31 27 31C23.6863 31 21 28.3137 21 25C21 19 26 14 26 14Z"
+                        fill="#88B237" opacity="0.7" />
+                </svg>
+                Plant Pulse
+            </a>
+            <button class="hamburger" id="ham"><span></span><span></span><span></span></button>
+            <div class="nav-links" id="nav-links">
+                <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About</a>
+                <a href="{{ url_for('upload') }}" class="nav-link">Scan Plant</a>
+                <a href="{{ url_for('history') }}" class="nav-link active">History</a>
+                <a href="{{ url_for('upload') }}" class="nav-link nav-cta">
+                    <span class="material-icons-round"
+                        style="font-size:16px;vertical-align:middle">filter_center_focus</span>&nbsp;Scan Now
+                </a>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-left:0.5rem;">
+                {% if current_user.is_authenticated %}
+                {% if current_user.avatar_url %}
+                <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" title="{{ current_user.name }}"
+                    style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--primary-light);">
+                {% else %}
+                <div style="width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;"
+                    title="{{ current_user.name }}">{{ current_user.name[0].upper() }}</div>
+                {% endif %}
+                <a href="{{ url_for('logout') }}"
+                    style="font-size:0.82rem;font-weight:600;color:var(--text-muted);text-decoration:none;">Sign out</a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="nav-link" style="font-weight:700;">Login</a>
+                <a href="{{ url_for('register') }}" class="nav-link nav-cta" style="padding:0.4rem 1rem;">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── MAIN ── -->
+    <div class="page-container">
+
+        <!-- Header row -->
+        <div class="history-header">
+            <div class="history-title-block">
+                <div>
+                    <div class="page-title" style="display:flex;align-items:center;gap:0.5rem;">
+                        Scan History
+                        <span class="history-count">{{ scans|length }}</span>
+                    </div>
+                    <div class="page-subtitle">{{ current_user.name }}'s plant scan history</div>
+                </div>
+            </div>
+            {% if scans %}
+            <form method="POST" action="{{ url_for('history_clear') }}"
+                onsubmit="return confirm('Clear all scan history? This cannot be undone.')">
+                <button type="submit" class="btn-clear">
+                    <span class="material-icons-round" style="font-size:16px">delete_sweep</span>
+                    Clear History
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        {% if scans %}
+
+        <!-- Stats bar -->
+        {% set total = scans|length %}
+        {% set healthy = scans|selectattr('is_healthy')|list|length %}
+        {% set diseased = total - healthy %}
+        {% set avg_conf = (scans|sum(attribute='confidence') / total)|round(1) %}
+
+        <div class="history-stats">
+            <div class="hstat">
+                <div class="hstat-icon" style="background:rgba(74,109,75,0.1)">
+                    <span class="material-icons-round" style="color:var(--primary)">photo_library</span>
+                </div>
+                <div>
+                    <div class="hstat-val">{{ total }}</div>
+                    <div class="hstat-lbl">Total Scans</div>
+                </div>
+            </div>
+            <div class="hstat">
+                <div class="hstat-icon" style="background:rgba(74,163,78,0.1)">
+                    <span class="material-icons-round" style="color:#2d7a30">eco</span>
+                </div>
+                <div>
+                    <div class="hstat-val">{{ healthy }}</div>
+                    <div class="hstat-lbl">Healthy Plants</div>
+                </div>
+            </div>
+            <div class="hstat">
+                <div class="hstat-icon" style="background:rgba(220,38,38,0.08)">
+                    <span class="material-icons-round" style="color:#b91c1c">bug_report</span>
+                </div>
+                <div>
+                    <div class="hstat-val">{{ diseased }}</div>
+                    <div class="hstat-lbl">Diseases Found</div>
+                </div>
+            </div>
+            <div class="hstat">
+                <div class="hstat-icon" style="background:rgba(59,130,246,0.08)">
+                    <span class="material-icons-round" style="color:#2563eb">analytics</span>
+                </div>
+                <div>
+                    <div class="hstat-val">{{ avg_conf }}%</div>
+                    <div class="hstat-lbl">Avg Confidence</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards grid -->
+        <div class="history-grid">
+            {% for scan in scans %}
+            <div class="scan-card">
+                <!-- Thumbnail -->
+                <a href="{{ url_for('result', filename=scan.filename) }}">
+                    {% if scan.filename %}
+                    <img class="scan-card-thumb" src="{{ url_for('uploaded_file', filename=scan.filename) }}"
+                        alt="{{ scan.plant }} leaf"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                    <div class="scan-card-thumb-placeholder" style="display:none">
+                        <span class="material-icons-round"
+                            style="font-size:3rem;color:rgba(255,255,255,0.6)">image</span>
+                    </div>
+                    {% else %}
+                    <div class="scan-card-thumb-placeholder">
+                        <span class="material-icons-round"
+                            style="font-size:3rem;color:rgba(255,255,255,0.6)">image</span>
+                    </div>
+                    {% endif %}
+                </a>
+
+                <div class="scan-card-body">
+                    <div class="scan-card-plant">{{ scan.plant }}</div>
+                    <div class="scan-card-disease">{{ scan.disease }}</div>
+                    <div class="scan-card-category">
+                        <span class="material-icons-round" style="font-size:14px">label</span>
+                        {{ scan.category }}
+                    </div>
+
+                    {% if scan.raw_class and scan.raw_class != 'N/A' %}
+                    <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;margin-top:0.25rem;">
+                        {{ scan.raw_class[:160] }}{% if scan.raw_class|length > 160 %}…{% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if not scan.is_healthy and scan.treatment %}
+                    <div
+                        style="margin-top:0.4rem;padding:0.6rem 0.75rem;background:rgba(74,109,75,0.06);border-left:3px solid var(--primary);border-radius:6px;font-size:0.76rem;color:var(--text);line-height:1.5;">
+                        <div
+                            style="font-weight:700;color:var(--primary);margin-bottom:0.25rem;display:flex;align-items:center;gap:0.3rem;">
+                            <span class="material-icons-round" style="font-size:13px">medication</span>
+                            Treatment
+                        </div>
+                        {{ scan.treatment[:200] }}{% if scan.treatment|length > 200 %}…{% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="scan-card-meta">
+                        <span class="confidence-pill {{ 'healthy' if scan.is_healthy else 'disease' }}">
+                            <span class="material-icons-round" style="font-size:12px">
+                                {{ 'check_circle' if scan.is_healthy else 'warning' }}
+                            </span>
+                            {{ scan.confidence }}%
+                        </span>
+                        <span class="scan-card-date">
+                            {{ scan.scanned_at.strftime('%d %b %Y, %H:%M') }}
+                        </span>
+                    </div>
+
+                    <a href="{{ url_for('result', filename=scan.filename) }}" class="view-btn">
+                        View full result
+                        <span class="material-icons-round" style="font-size:15px">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+
+        {% else %}
+
+        <!-- Empty state -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <span class="material-icons-round">history</span>
+            </div>
+            <h3>No scans yet</h3>
+            <p>Upload a plant leaf image to get started. Your results will appear here.</p>
+            <a href="{{ url_for('upload') }}" class="btn-primary" style="display:inline-flex;margin:0 auto;">
+                <span class="material-icons-round" style="font-size:20px">filter_center_focus</span>
+                Scan Your First Plant
+            </a>
+        </div>
+
+        {% endif %}
+
+    </div><!-- /page-container -->
+
+    <footer class="footer">
+        <p>© 2026 <strong>Plant Pulse</strong> — AI Plant Disease Detection &nbsp;|&nbsp;
+            <a href="{{ url_for('home') }}">Home</a> &nbsp;|&nbsp;
+            <a href="{{ url_for('upload') }}">Scan</a> &nbsp;|&nbsp;
+            <a href="{{ url_for('history') }}">History</a>
+        </p>
+    </footer>
+
+    <script>
+        document.getElementById('ham').addEventListener('click', () => {
+            document.getElementById('nav-links').classList.toggle('open');
+        });
+    </script>
+</body>
+
+</html>

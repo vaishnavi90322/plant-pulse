@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scan Plant — Plant Pulse</title>
+    <meta name="description" content="Upload a plant leaf photo or use your camera to detect diseases with AI." />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="{{ url_for('home') }}" class="logo">
+                <svg viewBox="0 0 40 40" fill="none">
+                    <path
+                        d="M20 5C20 5 12 15 12 22C12 26.4183 15.5817 30 20 30C24.4183 30 28 26.4183 28 22C28 15 20 5 20 5Z"
+                        fill="#4A6D4B" />
+                    <path d="M20 5C20 5 28 15 28 22C28 26.4183 24.4183 30 20 30L20 5Z" fill="#76A33E" />
+                    <path
+                        d="M26 14C26 14 33 19 33 25C33 28.3137 30.3137 31 27 31C23.6863 31 21 28.3137 21 25C21 19 26 14 26 14Z"
+                        fill="#88B237" opacity="0.7" />
+                </svg>
+                Plant Pulse
+            </a>
+            <button class="hamburger" id="ham"><span></span><span></span><span></span></button>
+            <div class="nav-links" id="nav-links">
+                <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About</a>
+                <a href="{{ url_for('upload') }}" class="nav-link active">Scan Plant</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('history') }}" class="nav-link">History</a>
+                {% endif %}
+                <a href="{{ url_for('upload') }}" class="nav-link nav-cta">
+                    <span class="material-icons-round"
+                        style="font-size:16px;vertical-align:middle">filter_center_focus</span>&nbsp;Scan Now
+                </a>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-left:0.5rem;">
+                {% if current_user.is_authenticated %}
+                {% if current_user.avatar_url %}
+                <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" title="{{ current_user.name }}"
+                    style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--primary-light);">
+                {% else %}
+                <div style="width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;"
+                    title="{{ current_user.name }}">{{ current_user.name[0].upper() }}</div>
+                {% endif %}
+                <a href="{{ url_for('logout') }}"
+                    style="font-size:0.82rem;font-weight:600;color:var(--text-muted);text-decoration:none;">Sign out</a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="nav-link" style="font-weight:700;">Login</a>
+                <a href="{{ url_for('register') }}" class="nav-link nav-cta" style="padding:0.4rem 1rem;">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── LOADING OVERLAY ── -->
+    <div class="loading-overlay" id="loader">
+        <div class="spinner"></div>
+        <div class="loading-text">Analyzing your plant…</div>
+        <div style="font-size:0.8rem;color:var(--text-muted)">MobileNetV2 is processing your image</div>
+    </div>
+
+    <!-- ── MAIN ── -->
+    <div class="page-container">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:2rem;">
+            <a href="{{ url_for('home') }}"
+                style="width:40px;height:40px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:var(--transition);">
+                <span class="material-icons-round" style="color:var(--text-muted)">arrow_back</span>
+            </a>
+            <div>
+                <div class="page-title">Scan a Plant</div>
+                <div class="page-subtitle">Upload an image or use your camera</div>
+            </div>
+        </div>
+
+        <!-- ── TAB SWITCHER ── -->
+        <div class="scan-tabs">
+            <button class="scan-tab active" id="tab-upload" onclick="switchTab('upload')">
+                <span class="material-icons-round">add_photo_alternate</span>
+                Upload Image
+            </button>
+            <button class="scan-tab" id="tab-camera" onclick="switchTab('camera')">
+                <span class="material-icons-round">photo_camera</span>
+                Use Camera
+            </button>
+        </div>
+
+        <!-- ── UPLOAD PANEL ── -->
+        <div id="panel-upload">
+
+            <!-- Animated scan icon -->
+            <div style="text-align:center;margin-bottom:2rem;margin-top:1.5rem;">
+                <div style="display:inline-block;position:relative;width:110px;height:110px;">
+                    <div class="scan-corner corner-tl"></div>
+                    <div class="scan-corner corner-tr"></div>
+                    <div class="scan-corner corner-bl"></div>
+                    <div class="scan-corner corner-br"></div>
+                    <div class="scan-line-anim"></div>
+                    <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">
+                        <svg width="52" height="52" viewBox="0 0 60 60" fill="none">
+                            <path
+                                d="M30 8C30 8 15 20 15 33C15 41.28 21.72 48 30 48C38.28 48 45 41.28 45 33C45 20 30 8 30 8Z"
+                                fill="#4A6D4B" opacity="0.8" />
+                            <path d="M30 8C30 8 45 20 45 33C45 41.28 38.28 48 30 48L30 8Z" fill="#76A33E"
+                                opacity="0.8" />
+                        </svg>
+                    </div>
+                </div>
+                <p
+                    style="font-size:0.78rem;color:var(--text-muted);margin-top:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">
+                    AI Scanner Ready</p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" id="upload-form" action="{{ url_for('upload') }}">
+                <label class="drop-zone" id="drop-zone" for="file-input">
+                    <input type="file" name="file" id="file-input" accept="image/*" />
+                    <div class="drop-icon">
+                        <span class="material-icons-round">add_photo_alternate</span>
+                    </div>
+                    <h3>Drop your plant image here</h3>
+                    <p>Supports JPG, PNG, WEBP · Max 16MB</p>
+                    <p>or</p>
+                    <span class="drop-browse">Browse File</span>
+                </label>
+
+                <!-- Preview -->
+                <div id="preview-wrap">
+                    <img id="preview-img" src="" alt="Preview" />
+                    <p id="preview-name"
+                        style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;text-align:center;"></p>
+                </div>
+
+                <button type="submit" class="upload-submit" id="submit-btn" disabled>
+                    <span class="material-icons-round" style="vertical-align:middle;margin-right:6px">psychology</span>
+                    Analyse with AI
+                </button>
+            </form>
+        </div>
+
+        <!-- ── CAMERA PANEL ── -->
+        <div id="panel-camera" style="display:none;margin-top:1.5rem;">
+
+            <!-- Camera viewfinder -->
+            <div class="camera-wrapper" id="camera-wrapper">
+                <!-- Corners overlay -->
+                <div class="cam-corner cam-tl"></div>
+                <div class="cam-corner cam-tr"></div>
+                <div class="cam-corner cam-bl"></div>
+                <div class="cam-corner cam-br"></div>
+
+                <!-- Live video -->
+                <video id="cam-video" autoplay playsinline muted></video>
+
+                <!-- Flash effect on capture -->
+                <div class="cam-flash" id="cam-flash"></div>
+
+                <!-- Tap-to-focus indicator -->
+                <div class="cam-focus" id="cam-focus"></div>
+            </div>
+
+            <!-- Camera captured preview -->
+            <div id="cam-preview-wrap" style="display:none;margin-top:1rem;">
+                <img id="cam-preview-img" src="" alt="Captured photo"
+                    style="width:100%;border-radius:var(--radius);border:1px solid var(--border);max-height:340px;object-fit:contain;" />
+                <p style="font-size:0.82rem;color:var(--text-muted);text-align:center;margin-top:0.5rem;">📸 Photo
+                    captured — click Analyse to detect disease</p>
+            </div>
+
+            <!-- Camera controls -->
+            <div class="camera-controls">
+                <button class="cam-btn cam-btn-switch" id="btn-flip" title="Flip camera">
+                    <span class="material-icons-round">flip_camera_ios</span>
+                </button>
+                <button class="cam-btn cam-btn-capture" id="btn-capture" title="Capture photo">
+                    <span class="material-icons-round">camera</span>
+                </button>
+                <button class="cam-btn cam-btn-retake" id="btn-retake" title="Retake" style="display:none;">
+                    <span class="material-icons-round">restart_alt</span>
+                </button>
+            </div>
+
+            <!-- Camera error message -->
+            <div id="cam-error" style="display:none;text-align:center;padding:2rem 1rem;color:var(--text-muted);">
+                <span class="material-icons-round"
+                    style="font-size:3rem;color:#ef4444;display:block;margin-bottom:0.75rem;">videocam_off</span>
+                <p id="cam-error-msg" style="font-weight:700;color:#ef4444;margin-bottom:0.4rem;">Camera not available
+                </p>
+                <p style="font-size:0.85rem;">Please allow camera access in your browser, or use the <strong>Upload
+                        Image</strong> tab instead.</p>
+            </div>
+
+            <!-- Camera submit button (hidden canvas for capture) -->
+            <canvas id="cam-canvas" style="display:none;"></canvas>
+            <form method="POST" enctype="multipart/form-data" id="cam-form" action="{{ url_for('upload') }}">
+                <input type="file" name="file" id="cam-file-input" accept="image/*" style="display:none;" />
+                <button type="submit" class="upload-submit" id="cam-submit-btn" style="display:none;margin-top:1rem;">
+                    <span class="material-icons-round" style="vertical-align:middle;margin-right:6px">psychology</span>
+                    Analyse with AI
+                </button>
+            </form>
+        </div>
+
+        <!-- ── TIPS ── -->
+        <div
+            style="margin-top:2.5rem;background:rgba(74,109,75,0.06);border:1px solid rgba(74,109,75,0.15);border-radius:var(--radius);padding:1.5rem;">
+            <h4
+                style="font-weight:700;color:var(--primary);margin-bottom:0.85rem;font-size:0.9rem;display:flex;align-items:center;gap:0.4rem;">
+                <span class="material-icons-round" style="font-size:18px">tips_and_updates</span> Tips for best results
+            </h4>
+            <ul style="list-style:none;display:flex;flex-direction:column;gap:0.55rem;">
+                {% for tip in [
+                "Use a clear, well-lit photo of the affected leaf",
+                "Capture the full leaf — avoid extreme close-ups",
+                "Avoid blurry or dark images",
+                "Include the diseased spots in the frame",
+                "Natural daylight gives the best results"
+                ] %}
+                <li style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.84rem;color:var(--text-muted);">
+                    <span class="material-icons-round"
+                        style="font-size:16px;color:var(--accent);flex-shrink:0;margin-top:1px">check_circle</span>
+                    {{ tip }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div><!-- /page-container -->
+
+    <footer class="footer">
+        <p>© 2026 <strong>Plant Pulse</strong> — AI Plant Disease Detection &nbsp;|&nbsp;
+            <a href="{{ url_for('history') }}">History</a>
+        </p>
+    </footer>
+
+    <script>
+        /* ═══════════════════════  TAB SWITCHING  ═══════════════════════ */
+        function switchTab(tab) {
+            const isUpload = tab === 'upload';
+            document.getElementById('panel-upload').style.display = isUpload ? 'block' : 'none';
+            document.getElementById('panel-camera').style.display = isUpload ? 'none' : 'block';
+            document.getElementById('tab-upload').classList.toggle('active', isUpload);
+            document.getElementById('tab-camera').classList.toggle('active', !isUpload);
+            if (!isUpload) initCamera();
+            else stopCamera();
+        }
+
+        /* ═══════════════════════  UPLOAD PANEL  ═══════════════════════ */
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone');
+        const preview = document.getElementById('preview-img');
+        const prevWrap = document.getElementById('preview-wrap');
+        const prevName = document.getElementById('preview-name');
+        const submitBtn = document.getElementById('submit-btn');
+        const uploadForm = document.getElementById('upload-form');
+        const loader = document.getElementById('loader');
+
+        function showUploadPreview(file) {
+            if (!file || !file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                prevWrap.style.display = 'block';
+                prevName.textContent = file.name;
+                submitBtn.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        fileInput.addEventListener('change', () => showUploadPreview(fileInput.files[0]));
+
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) { fileInput.files = e.dataTransfer.files; showUploadPreview(file); }
+        });
+
+        uploadForm.addEventListener('submit', () => loader.classList.add('show'));
+
+        /* ═══════════════════════  CAMERA PANEL  ═══════════════════════ */
+        let stream = null;
+        let facingMode = 'environment'; // rear camera by default
+
+        const video = document.getElementById('cam-video');
+        const canvas = document.getElementById('cam-canvas');
+        const camPreviewWrap = document.getElementById('cam-preview-wrap');
+        const camPreviewImg = document.getElementById('cam-preview-img');
+        const btnCapture = document.getElementById('btn-capture');
+        const btnRetake = document.getElementById('btn-retake');
+        const btnFlip = document.getElementById('btn-flip');
+        const camSubmitBtn = document.getElementById('cam-submit-btn');
+        const camFileInput = document.getElementById('cam-file-input');
+        const camForm = document.getElementById('cam-form');
+        const camError = document.getElementById('cam-error');
+        const camErrorMsg = document.getElementById('cam-error-msg');
+        const camFlash = document.getElementById('cam-flash');
+        const camFocus = document.getElementById('cam-focus');
+
+        async function initCamera() {
+            camError.style.display = 'none';
+            try {
+                if (stream) stopCamera();
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: false
+                });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                btnCapture.style.display = 'flex';
+                btnFlip.style.display = 'flex';
+                resetCameraUI();
+            } catch (err) {
+                camError.style.display = 'block';
+                camErrorMsg.textContent = err.name === 'NotAllowedError'
+                    ? 'Camera permission denied'
+                    : err.name === 'NotFoundError'
+                        ? 'No camera found on this device'
+                        : 'Camera unavailable: ' + err.message;
+                video.style.display = 'none';
+                btnCapture.style.display = 'none';
+                btnFlip.style.display = 'none';
+            }
+        }
+
+        function stopCamera() {
+            if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+        }
+
+        function resetCameraUI() {
+            camPreviewWrap.style.display = 'none';
+            camSubmitBtn.style.display = 'none';
+            btnRetake.style.display = 'none';
+            btnCapture.style.display = 'flex';
+            video.style.display = 'block';
+        }
+
+        /* Capture photo */
+        btnCapture.addEventListener('click', () => {
+            if (!stream) return;
+
+            // Flash effect
+            camFlash.classList.add('flash-active');
+            setTimeout(() => camFlash.classList.remove('flash-active'), 400);
+
+            // Draw frame to canvas
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            // Show preview
+            const dataURL = canvas.toDataURL('image/jpeg', 0.92);
+            camPreviewImg.src = dataURL;
+            camPreviewWrap.style.display = 'block';
+            video.style.display = 'none';
+            btnCapture.style.display = 'none';
+            btnRetake.style.display = 'flex';
+            camSubmitBtn.style.display = 'block';
+
+            // Convert to Blob and inject into hidden file input
+            canvas.toBlob(blob => {
+                const file = new File([blob], 'camera_capture.jpg', { type: 'image/jpeg' });
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                camFileInput.files = dt.files;
+            }, 'image/jpeg', 0.92);
+        });
+
+        /* Retake */
+        btnRetake.addEventListener('click', () => {
+            camPreviewWrap.style.display = 'none';
+            camSubmitBtn.style.display = 'none';
+            btnRetake.style.display = 'none';
+            btnCapture.style.display = 'flex';
+            video.style.display = 'block';
+        });
+
+        /* Flip camera */
+        btnFlip.addEventListener('click', () => {
+            facingMode = facingMode === 'environment' ? 'user' : 'environment';
+            initCamera();
+        });
+
+        /* Camera form submit */
+        camForm.addEventListener('submit', () => loader.classList.add('show'));
+
+        /* Tap-to-focus visual indicator */
+        video.addEventListener('click', e => {
+            const rect = video.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            camFocus.style.left = (x - 24) + 'px';
+            camFocus.style.top = (y - 24) + 'px';
+            camFocus.classList.add('focus-active');
+            setTimeout(() => camFocus.classList.remove('focus-active'), 700);
+        });
+
+        /* ═══════════════════════  HAMBURGER  ═══════════════════════ */
+        document.getElementById('ham').addEventListener('click', () => {
+            document.getElementById('nav-links').classList.toggle('open');
+        });
+
+        /* Stop camera when leaving page */
+        window.addEventListener('beforeunload', stopCamera);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plant Pulse — AI Plant Disease Detection</title>
+  <meta name="description"
+    content="Detect plant diseases instantly with AI. Upload a photo of your plant leaf and get accurate diagnosis powered by MobileNetV2." />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+</head>
+
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="{{ url_for('home') }}" class="logo">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 5C20 5 12 15 12 22C12 26.4183 15.5817 30 20 30C24.4183 30 28 26.4183 28 22C28 15 20 5 20 5Z"
+            fill="#4A6D4B" />
+          <path d="M20 5C20 5 28 15 28 22C28 26.4183 24.4183 30 20 30L20 5Z" fill="#76A33E" />
+          <path d="M26 14C26 14 33 19 33 25C33 28.3137 30.3137 31 27 31C23.6863 31 21 28.3137 21 25C21 19 26 14 26 14Z"
+            fill="#88B237" opacity="0.7" />
+        </svg>
+        Plant Pulse
+      </a>
+      <button class="hamburger" id="ham" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="nav-links">
+        <a href="{{ url_for('home') }}" class="nav-link active">Home</a>
+        <a href="{{ url_for('about') }}" class="nav-link">About</a>
+        <a href="{{ url_for('upload') }}" class="nav-link">Scan Plant</a>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('history') }}" class="nav-link">History</a>
+        {% endif %}
+        <a href="{{ url_for('upload') }}" class="nav-link nav-cta">
+          <span class="material-icons-round" style="font-size:16px;vertical-align:middle">filter_center_focus</span>
+          &nbsp;Scan Now
+        </a>
+      </div>
+      <!-- Auth state -->
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-left:0.5rem;">
+        {% if current_user.is_authenticated %}
+        {% if current_user.avatar_url %}
+        <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" title="{{ current_user.name }}"
+          style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--primary-light);">
+        {% else %}
+        <div
+          style="width:34px;height:34px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;"
+          title="{{ current_user.name }}">{{ current_user.name[0].upper() }}</div>
+        {% endif %}
+        <a href="{{ url_for('logout') }}"
+          style="font-size:0.82rem;font-weight:600;color:var(--text-muted);text-decoration:none;" title="Sign out">Sign
+          out</a>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="nav-link" style="font-weight:700;">Login</a>
+        <a href="{{ url_for('register') }}" class="nav-link nav-cta" style="padding:0.4rem 1rem;">Sign Up</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+
+    <div class="hero-inner">
+      <!-- Left text -->
+      <div class="hero-text">
+        <div class="hero-badge">
+          <span></span> AI-Powered Plant Care
+        </div>
+        <h1 class="hero-title">
+          Detect Plant<br><em>Diseases Instantly</em><br>with AI
+        </h1>
+        <p class="hero-desc">
+          Upload a photo of any plant leaf — Plant Pulse's MobileNetV2 model identifies
+          diseases from <strong>38 classes</strong> in seconds, giving you actionable
+          treatment guidance.
+        </p>
+        <div class="btn-group">
+          <a href="{{ url_for('upload') }}" class="btn-primary">
+            <span class="material-icons-round" style="font-size:20px">filter_center_focus</span>
+            Scan a Plant
+          </a>
+          <a href="{{ url_for('about') }}" class="btn-secondary">
+            <span class="material-icons-round" style="font-size:20px">info_outline</span>
+            Learn More
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-num">38</div>
+            <div class="stat-lbl">Disease Classes</div>
+          </div>
+          <div>
+            <div class="stat-num">87K+</div>
+            <div class="stat-lbl">Training Images</div>
+          </div>
+          <div>
+            <div class="stat-num">95%+</div>
+            <div class="stat-lbl">Model Accuracy</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right visual -->
+      <div class="hero-visual">
+        <div class="hero-phone">
+          <!-- floating tags -->
+          <div class="hero-tag hero-tag-1" style="color:var(--primary)">
+            <div class="hero-tag-dot" style="background:var(--success)"></div>
+            Healthy Plant ✓
+          </div>
+          <div class="hero-tag hero-tag-2" style="color:#dc2626">
+            <div class="hero-tag-dot" style="background:#ef4444"></div>
+            Septoria Spot — 94%
+          </div>
+
+          <!-- Phone card -->
+          <div class="hero-phone-card">
+            <!-- Decorative scan frame inside the phone card -->
+            <div
+              style="background:linear-gradient(135deg,#2D4A31,#4A6D4B,#76A33E);aspect-ratio:9/16;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;padding:2rem;">
+              <div style="position:relative;width:160px;height:160px;">
+                <!-- corners -->
+                <div
+                  style="position:absolute;top:0;left:0;width:36px;height:36px;border-top:4px solid #88B237;border-left:4px solid #88B237;border-radius:10px 0 0 0;">
+                </div>
+                <div
+                  style="position:absolute;top:0;right:0;width:36px;height:36px;border-top:4px solid #88B237;border-right:4px solid #88B237;border-radius:0 10px 0 0;">
+                </div>
+                <div
+                  style="position:absolute;bottom:0;left:0;width:36px;height:36px;border-bottom:4px solid #88B237;border-left:4px solid #88B237;border-radius:0 0 0 10px;">
+                </div>
+                <div
+                  style="position:absolute;bottom:0;right:0;width:36px;height:36px;border-bottom:4px solid #88B237;border-right:4px solid #88B237;border-radius:0 0 10px 0;">
+                </div>
+                <!-- leaf icon -->
+                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+                  <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                    <path d="M40 8C40 8 18 28 18 48C18 60.15 27.85 70 40 70C52.15 70 62 60.15 62 48C62 28 40 8 40 8Z"
+                      fill="rgba(255,255,255,0.15)" />
+                    <path
+                      d="M40 12C40 12 20 30 20 48C20 59.05 28.95 68 40 68C51.05 68 60 59.05 60 48C60 30 40 12 40 12Z"
+                      fill="rgba(255,255,255,0.25)" />
+                    <path d="M40 12 Q45 40 40 68" stroke="rgba(255,255,255,0.4)" stroke-width="2"
+                      stroke-linecap="round" />
+                  </svg>
+                </div>
+              </div>
+              <div
+                style="color:rgba(255,255,255,0.9);font-family:'Outfit',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:0.1em;text-transform:uppercase;">
+                PLANT PULSE</div>
+              <div style="color:rgba(255,255,255,0.65);font-size:0.78rem;font-weight:500;text-align:center;">AI Powered
+                Plant Care</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ── -->
+  <section class="features">
+    <div class="section-header">
+      <span class="section-label">How it works</span>
+      <h2 class="section-title">Smart Diagnosis in 3 Steps</h2>
+    </div>
+    <div class="cards-grid">
+      <div class="feat-card">
+        <div class="feat-icon">
+          <span class="material-icons-round">add_photo_alternate</span>
+        </div>
+        <h3>Upload a Photo</h3>
+        <p>Take a clear photo of the affected leaf and upload it directly from your device.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <span class="material-icons-round">psychology</span>
+        </div>
+        <h3>AI Analysis</h3>
+        <p>Our MobileNetV2 model — trained on 87K+ plant images — classifies the disease instantly.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <span class="material-icons-round">medication</span>
+        </div>
+        <h3>Get Treatment</h3>
+        <p>Receive detailed info on the disease category, spread, and recommended treatment.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <span class="material-icons-round">spa</span>
+        </div>
+        <h3>38 Disease Classes</h3>
+        <p>Covers Apple, Tomato, Potato, Corn, Grape, Peach, Pepper, Strawberry, and more.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA STRIP ── -->
+  <section
+    style="background:linear-gradient(135deg,var(--primary),var(--primary-light));padding:4rem 1.5rem;text-align:center;">
+    <h2 style="font-family:'Outfit',sans-serif;font-size:2rem;font-weight:800;color:#fff;margin-bottom:0.75rem;">Ready
+      to diagnose your plant?</h2>
+    <p style="color:rgba(255,255,255,0.8);margin-bottom:2rem;font-size:1rem;">Upload a leaf photo and get instant
+      AI-powered results.</p>
+    <a href="{{ url_for('upload') }}" class="btn-primary"
+      style="display:inline-flex;margin:0 auto;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.4);backdrop-filter:blur(8px);">
+      <span class="material-icons-round" style="font-size:20px">filter_center_focus</span>
+      Start Scanning
+    </a>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <p>© 2026 <strong>Plant Pulse</strong> — AI Plant Disease Detection &nbsp;|&nbsp;
+      <a href="{{ url_for('about') }}">About</a> &nbsp;|&nbsp;
+      <a href="{{ url_for('upload') }}">Scan</a> &nbsp;|&nbsp;
+      <a href="{{ url_for('history') }}">History</a>
+    </p>
+    <p style="margin-top:0.35rem;font-size:0.78rem;opacity:0.55;">MobileNetV2 · PlantVillage Dataset · Flask · Python
+    </p>
+  </footer>
+
+  <script>
+    document.getElementById('ham').addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
+  </script>
+</body>
+
+</html>
